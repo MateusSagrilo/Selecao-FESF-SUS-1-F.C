@@ -1,10 +1,17 @@
 from fastapi import FastAPI
 
+from app.database import Base, engine
+from app import models
+
+
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
-    title="Seleção FESF-SUS – 1 F.C",
-    description="API desenvolvida para o Processo Seletivo FESF-SUS – 1 F.C",
+    title="Seleção FESF-SUS API",
+    description="API desenvolvida com FastAPI para o processo seletivo FESF-SUS",
     version="1.0.0",
 )
+
 
 @app.get("/")
 def read_root():
