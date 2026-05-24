@@ -189,6 +189,7 @@ class AppointmentUpdate(BaseModel):
 class AppointmentResponse(AppointmentBase):
     id: int
     created_at: datetime
+    patient_name: Optional[str] = None
 
     class Config:
         from_attributes = True

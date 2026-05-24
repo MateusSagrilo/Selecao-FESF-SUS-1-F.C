@@ -57,19 +57,33 @@ def create_appointment(
     response_model=List[AppointmentResponse]
 )
 def list_appointments(
-    status: str | None = None,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Appointment)
-
-    if status:
-        query = query.filter(Appointment.status == status)
-
-    appointments = query.order_by(
+    appointments = db.query(Appointment).order_by(
         Appointment.created_at.desc()
     ).all()
 
-    return appointments
+    result = []
+
+    for appointment in appointments:
+        patient = db.query(Patient).filter(
+            Patient.id == appointment.patient_id
+        ).first()
+
+        appointment_dict = {
+            "id": appointment.id,
+            "patient_id": appointment.patient_id,
+            "patient_name": patient.name if patient else None,
+            "service_type": appointment.service_type,
+            "professional_name": appointment.professional_name,
+            "status": appointment.status,
+            "notes": appointment.notes,
+            "created_at": appointment.created_at,
+        }
+
+        result.append(appointment_dict)
+
+    return result
 
 
 @router.get(

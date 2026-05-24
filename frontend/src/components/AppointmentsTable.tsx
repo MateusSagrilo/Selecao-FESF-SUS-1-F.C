@@ -15,6 +15,10 @@ type AppointmentsTableProps = {
   onDataChange?: () => void;
 };
 
+function getPatientDisplayName(appointment: Appointment) {
+  return appointment.patient_name || `Paciente #${appointment.patient_id}`;
+}
+
 function getStatusLabel(status: Appointment["status"]) {
   const labels = {
     pending: "Pendente",
@@ -39,13 +43,9 @@ function getStatusClass(status: Appointment["status"]) {
 
 export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-
   const [patients, setPatients] = useState<Patient[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [creating, setCreating] = useState(false);
-
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -64,7 +64,6 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
       ]);
 
       setAppointments(appointmentsData);
-
       setPatients(patientsData);
     } catch {
       setError("Erro ao carregar atendimentos.");
@@ -81,7 +80,6 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
     event.preventDefault();
 
     setCreating(true);
-
     setError("");
 
     try {
@@ -102,7 +100,6 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
       });
 
       await loadData();
-
       onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
@@ -121,9 +118,7 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
   ) {
     try {
       await updateAppointmentStatus(appointmentId, status);
-
       await loadData();
-
       onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
@@ -240,8 +235,6 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
-      {/* MOBILE */}
-
       <div className="md:hidden space-y-4">
         {appointments.map((appointment) => (
           <div
@@ -253,7 +246,7 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
             </p>
 
             <p className="text-sm text-gray-700">
-              Paciente ID: {appointment.patient_id}
+              Paciente: {getPatientDisplayName(appointment)}
             </p>
 
             <p className="text-sm text-gray-700">
@@ -291,14 +284,12 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
         ))}
       </div>
 
-      {/* DESKTOP */}
-
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b">
               <th className="text-left py-3 text-gray-700 font-semibold">
-                Paciente ID
+                Paciente
               </th>
 
               <th className="text-left py-3 text-gray-700 font-semibold">
@@ -318,7 +309,9 @@ export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
           <tbody>
             {appointments.map((appointment) => (
               <tr key={appointment.id} className="border-b hover:bg-gray-50">
-                <td className="py-3 text-gray-800">{appointment.patient_id}</td>
+                <td className="py-3 text-gray-800">
+                  {getPatientDisplayName(appointment)}
+                </td>
 
                 <td className="py-3 text-gray-800">
                   {appointment.service_type}
