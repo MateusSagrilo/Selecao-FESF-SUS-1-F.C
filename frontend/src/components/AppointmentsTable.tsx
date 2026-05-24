@@ -11,7 +11,11 @@ import {
   updateAppointmentStatus,
 } from "@/services/api";
 
-export function AppointmentsTable() {
+type AppointmentsTableProps = {
+  onDataChange?: () => void;
+};
+
+export function AppointmentsTable({ onDataChange }: AppointmentsTableProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
 
@@ -71,6 +75,7 @@ export function AppointmentsTable() {
       });
 
       await loadData();
+      onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -90,6 +95,7 @@ export function AppointmentsTable() {
       await updateAppointmentStatus(appointmentId, status);
 
       await loadData();
+      onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

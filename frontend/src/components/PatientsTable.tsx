@@ -9,7 +9,11 @@ import {
 } from "@/services/api";
 
 
-export function PatientsTable() {
+type PatientsTableProps = {
+    onDataChange?: () => void;
+  };
+
+export function PatientsTable({onDataChange}: PatientsTableProps) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,6 +66,7 @@ export function PatientsTable() {
       });
 
       await loadPatients();
+      onDataChange?.();
     } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
